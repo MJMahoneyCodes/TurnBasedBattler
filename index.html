@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turn-Based-Battler</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .parent { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-gap: 20px; 
+            border: 1px solid black; 
+            width: 50%; 
+        } 
+        .parent-small { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            grid-gap: 20px; 
+            width: 25%; 
+        } 
+        .child { 
+            margin: 10px; 
+            border: 1px solid black; 
+        }
+        .child-small { 
+            margin: 10px; 
+        }
+        .battle-log { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            grid-gap: 20px; 
+            border: 1px solid black; 
+            width: 50%; 
+        } 
+
+    </style>
+</head>
+<body>
+    <div class="parent">
+        <div class="child" id="player-info">
+            <h1>Player</h1>
+            <h2>Experience: <span id="player-experience"></span></h2>
+            <p>Health: <span id="player-health"></span></p>
+            <p>Strength: <span id="player-strength"></span></p>
+            <p>Defense: <span id="player-defense"></span></p>
+            <p>Speed: <span id="player-speed"></span></p>
+            <p>Luck: <span id="player-luck"></span></p>
+        </div>
+        <div class="child" id="enemy-info">
+            <h1>Enemy</h1>
+            <p>Name: <span id="enemy-name"></span></p>
+            <p>Health: <span id="enemy-health"></span></p>
+            <p>Strength: <span id="enemy-strength"></span></p>
+            <p>Defense: <span id="enemy-defense"></span></p>
+            <p>Experience: <span id="enemy-experience"></span></p>
+        </div>
+    </div>
+    <div class="parent-small">
+        <div class="child-small">
+            <button id="btnAttack" onclick="attackEnemy()">Attack</button>
+            <p>Attack with your weapon</p>
+        </div>
+        <div class="child-small">
+            <button id="btnDefend" onclick="defendPlayer()">Defend</button>
+            <p>Defend yourself and heal a small amount</p>
+        </div>
+    </div>
+    <div class="battle-log">
+        <h2>Battle Log</h2>
+        <ul id="battle-log-items">
+
+        </ul>
+    </div>
+    <script>
+        //initialize game variables
+        var playerExperience = 0;
+        $("#player-experience").text(playerExperience);
+        var playerHealth = 100;
+        $("#player-health").text(playerHealth);
+        var playerStrength = 1;
+        $("#player-strength").text(playerStrength);
+        var playerDefense = 1;
+        $("#player-defense").text(playerDefense);
+        var playerLuck = 1;
+        $("#player-luck").text(playerLuck);
+
+        var enemyName = "";
+        $("#enemy-name").text(enemyName);
+        var enemyHealth = 0;
+        $("#enemy-health").text(enemyHealth);
+        var enemyStrength = 0;
+        $("#enemy-strength").text(enemyStrength);
+        var enemyDefense = 0;
+        $("#enemy-defense").text(enemyDefense);
+        var enemyExperience = 0;
+        $("#enemy-experience").text(enemyExperience);
+
+        //create an enemy with random stats
+        function createEnemy(){
+            //generate random stats
+            enemyHealth = Math.floor(Math.random() * 100) + 1;
+            $("#enemy-health").text(enemyHealth);
+            enemyStrength = Math.floor(Math.random() * 5) + 1;
+            $("#enemy-strength").text(enemyStrength);
+            enemyDefense = Math.floor(Math.random() * 5) + 1;
+            $("#enemy-defense").text(enemyDefense);
+            enemyExperience = Math.floor(Math.random() * 20) + 1 + enemyHealth;
+            $("#enemy-experience").text(enemyExperience);
+
+            //choose a random number from 1 to 6
+            var randomNumber = Math.floor(Math.random() * 6) + 1;
+            //if the number is 1, the enemy is a goblin
+            if(randomNumber == 1){
+                enemyName = "Goblin";
+                $("#enemy-name").text(enemyName);
+            }
+            //if the number is 2, the enemy is a troll
+            else if(randomNumber == 2){
+                enemyName = "Troll";
+                $("#enemy-name").text(enemyName);
+            }
+            //if the number is 3, the enemy is a dragon
+            else if(randomNumber == 3){
+                enemyName = "Dragon";
+                $("#enemy-name").text(enemyName);
+            }
+            //if the number is 4, the enemy is a demon
+            else if(randomNumber == 4){
+                enemyName = "Demon";
+                $("#enemy-name").text(enemyName);
+            }
+            //if the number is 5, the enemy is a vampire
+            else if(randomNumber == 5){
+                enemyName = "Vampire";
+                $("#enemy-name").text(enemyName);
+            }
+            //if the number is 6, the enemy is a werewolf
+            else if(randomNumber == 6){
+                enemyName = "Werewolf";
+                $("#enemy-name").text(enemyName);
+            }
+        }
+
+        //create a function to attack the enemy
+        function attackEnemy(){
+            //calculate damage
+            var damage = Math.floor(Math.random() * 10) + 1 + playerStrength;
+            //subtract damage from enemy's health
+            enemyHealth = Math.min(enemyHealth, (enemyHealth + enemyDefense) - damage);
+            //update enemy's health
+            $("#enemy-health").text(enemyHealth);
+            //add to battle log
+            $("#battle-log-items").append("<li>You attacked the " + enemyName + " for " + damage + " damage.</li>");
+            if(damage <= enemyDefense){
+                $("#battle-log-items").append("<li>The " + enemyName + " blocked your attack.</li>");
+                clearBattleLog();
+            }
+            clearBattleLog();
+            //if the enemy's health is less than or equal to 0, the enemy is defeated
+            if(enemyHealth <= 0){
+                //add to battle log
+                $("#battle-log-items").append("<li>You defeated the " + enemyName + "!</li>");
+                //add experience to player
+                playerExperience = playerExperience + enemyExperience;
+                $("#player-experience").text(playerExperience);
+                //create a new enemy
+                createEnemy();
+            }
+            //if the enemy's health is greater than 0, the enemy is still alive
+            else{
+                //calculate damage
+                var enemyDamage = Math.floor(Math.random() * enemyStrength) + 1 - playerDefense;
+                //subtract damage from player's health
+                playerHealth = playerHealth - enemyDamage;
+                //update player's health
+                $("#player-health").text(playerHealth);
+                //add to battle log
+                $("#battle-log-items").append("<li>The " + enemyName + " attacked you for " + enemyDamage + " damage.</li>");
+                clearBattleLog();
+                //if the player's health is less than or equal to 0, the player is defeated
+                if(playerHealth <= 0){
+                    //add to battle log
+                    $("#battle-log-items").append("<li>You were defeated by the " + enemyName + "!</li>");
+                    //reset player's health
+                    playerHealth = 100;
+                    $("#player-health").text(playerHealth);
+                    //reset enemy's health
+                    enemyHealth = 0;
+                    $("#enemy-health").text(enemyHealth);
+                    //reset player's experience
+                    playerExperience = 0;
+                    $("#player-experience").text(playerExperience);
+                }
+            }
+        }
+
+        //create a function to clear the battle log after 5 li items
+        function clearBattleLog(){
+            //if the battle log has more than 5 li items, remove the first li item
+            if($("#battle-log-items li").length > 5){
+                $("#battle-log-items li:first").remove();
+            }
+        }
+
+        //create a function to defend and heal some player health
+        function defendPlayer(){
+            //calculate damage
+            var damage = Math.floor(Math.random() * enemyStrength) + 1 - (playerDefense * 2);
+            //subtract damage from player's health
+            playerHealth = playerHealth - damage;
+            //update player's health
+            $("#player-health").text(playerHealth);
+            //add to battle log
+            $("#battle-log-items").append("<li>You defended yourself.</li>");
+            clearBattleLog();
+            $("#battle-log-items").append("<li>The " + enemyName + " attacked you for " + damage + " damage.</li>");
+            clearBattleLog();
+            //heal the player a small amount
+            playerHealth = playerHealth + Math.floor(Math.random() * 5) + 1;
+            //if player health is over 100, set it to 100
+            if(playerHealth > 100){
+                playerHealth = 100;
+            }
+            //update player's health
+            $("#player-health").text(playerHealth);
+            //add to battle log
+            $("#battle-log-items").append("<li>You healed yourself for " + Math.floor(Math.random() * 5) + 1 + " health.</li>");
+            clearBattleLog();
+            //if the player's health is less than or equal to 0, the player is defeated
+            if(playerHealth <= 0){
+                //add to battle log
+                $("#battle-log-items").append("<li>You were defeated by the " + enemyName + "!</li>");
+                //reset player's health
+                playerHealth = 100;
+                $("#player-health").text(playerHealth);
+                //reset enemy's health
+                enemyHealth = 0;
+                $("#enemy-health").text(enemyHealth);
+                //reset player's experience
+                playerExperience = 0;
+                $("#player-experience").text(playerExperience);
+            }
+        }
+
+        //create a function to level up the player's stats when they reach 100 experience points
+        
+
+        //create the first enemy of the game
+        createEnemy();
+    </script>
+</body>
+</html>
