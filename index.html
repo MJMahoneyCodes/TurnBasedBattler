@@ -165,6 +165,8 @@
                 //add experience to player
                 playerExperience = playerExperience + enemyExperience;
                 $("#player-experience").text(playerExperience);
+                //level up check
+                levelUp();
                 //create a new enemy
                 createEnemy();
             }
@@ -245,7 +247,22 @@
         }
 
         //create a function to level up the player's stats when they reach 100 experience points
-        
+        function levelUp(){
+            //if the player's experience is greater than or equal to 100, level up
+            if(playerExperience >= 100){
+                //add to battle log
+                $("#battle-log-items").append("<li>You leveled up!</li>");
+                //add 1 to player's strength
+                playerStrength = playerStrength + 1;
+                $("#player-strength").text(playerStrength);
+                //add 1 to player's defense
+                playerDefense = playerDefense + 1;
+                $("#player-defense").text(playerDefense);
+                //reset player's experience
+                playerExperience = 0;
+                $("#player-experience").text(playerExperience);
+            }
+        }
 
         //create the first enemy of the game
         createEnemy();
