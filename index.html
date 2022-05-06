@@ -210,7 +210,7 @@
         //create a function to defend and heal some player health
         function defendPlayer(){
             //calculate damage
-            var damage = Math.floor(Math.random() * enemyStrength) + 1 - (playerDefense * 2);
+            var damage = Math.floor(Math.random() * enemyStrength + 1 - (playerDefense * 2));
             //subtract damage from player's health
             playerHealth = playerHealth - damage;
             //update player's health
